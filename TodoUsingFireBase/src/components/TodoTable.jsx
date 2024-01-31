@@ -27,9 +27,9 @@ function TodoTable({
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"></thead>
           <tbody>
-            {todoList.map((todo) => (
+            {todoList.map((todotable) => (
               <tr
-                key={todo.id}
+                key={todotable.id}
                 className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
               >
                 <th
@@ -37,11 +37,11 @@ function TodoTable({
                   className=" flex justify-between px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                 >
                   <p className=" text-balance  truncate break-all w-[100%] flex gap-2">
-                    {todo.data}
+                    {todotable.todo}
                   </p>
                   <div className="flex justify-between text-xl gap-2">
-                    <MdDelete onClick={() => handleDelete(todo.id)} />
-                    <FaEdit onClick={() => handleEdit(todo.id, todo.data)} />
+                    <MdDelete onClick={() => handleDelete(todotable.id)} />
+                    <FaEdit onClick={() => handleEdit(todotable.id, todotable.todo)} />
                   </div>
                 </th>
               </tr>

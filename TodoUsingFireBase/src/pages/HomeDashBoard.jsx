@@ -4,24 +4,20 @@ import Button from "../components/Button";
 import { v4 as uuid } from "uuid";
 import TodoTable from "../components/TodoTable";
 import { db } from "../Firebase";
-import { collection, onSnapshot } from "firebase/firestore";
-import { getDatabase, ref, onValue } from "firebase/database";
+import { addDoc, collection, doc, onSnapshot, updateDoc } from "firebase/firestore";
 
 function HomeDashBoard() {
   const [todoInput, setTodoInput] = useState("");
   const [todoList, setTodoList] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [selectedTodoId, setSelectedTodoId] = useState(null);
-  const id = uuid();
 
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "todos"), (snapshot) => {
-      const value = snapshot.docs.map((e) => e.data());
-      const fireId = snapshot.docs.map((e) => e.id);
-      setTodoList(value, fireId);
+    useEffect(()=>{
+    const unsubscribe=onSnapshot(collection(db,'todos'),(snapshot)=>{
+        setTodoList(snapshot.docs.map((doc)=>({id:doc.id,todo:doc.data().todo,checked:doc.data().checked})))
     });
-    return unsubscribe;
-  }, []);
+    return()=> unsubscribe();
+},[])
   const handleTodoInput = (e) => {
     setTodoInput(e.target.value);
   };
@@ -29,7 +25,7 @@ function HomeDashBoard() {
   const handleSubmit = async () => {
     try {
       if (todoInput.trim() !== "") {
-        setTodoList([...todoList, { id: id, data: todoInput, checked: false }]);
+        await addDoc(collection(db,'todos'),{todo:todoInput,id:uuid(),checked:false})
         setTodoInput("");
       }
     } catch (error) {
@@ -38,10 +34,8 @@ function HomeDashBoard() {
   };
   const handleUpdate = async (id, data) => {
     try {
-      const updatedList = todoList.map((todo) => {
-        return todo.id === id ? { ...todo, data: data } : todo;
-      });
-      setTodoList(updatedList);
+    const updatedList=doc(db,'todos',todoList[selectedTodoId].id)
+    await updateDoc(updatedList,{todo:todoInput});
     } catch (error) {
       console.message(error.message);
     }
@@ -50,6 +44,7 @@ function HomeDashBoard() {
     isEdit(false);
     setSelectedTodoId(null);
   };
+  console.log(selectedTodoId);
   return (
     <div className="w-[60%] m-auto">
       <form onSubmit={(e) => e.preventDefault()}>
