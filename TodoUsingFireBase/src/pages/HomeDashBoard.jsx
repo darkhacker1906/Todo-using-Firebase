@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InputField from "../components/InputField";
 import Button from "../components/Button";
 import { v4 as uuid } from "uuid";
 import TodoTable from "../components/TodoTable";
+import { db } from "../Firebase";
+import { collection, onSnapshot } from "firebase/firestore";
+import { getDatabase, ref, onValue } from "firebase/database";
 
 function HomeDashBoard() {
   const [todoInput, setTodoInput] = useState("");
@@ -11,6 +14,14 @@ function HomeDashBoard() {
   const [selectedTodoId, setSelectedTodoId] = useState(null);
   const id = uuid();
 
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "todos"), (snapshot) => {
+      const value = snapshot.docs.map((e) => e.data());
+      const fireId = snapshot.docs.map((e) => e.id);
+      setTodoList(value, fireId);
+    });
+    return unsubscribe;
+  }, []);
   const handleTodoInput = (e) => {
     setTodoInput(e.target.value);
   };
@@ -22,7 +33,7 @@ function HomeDashBoard() {
         setTodoInput("");
       }
     } catch (error) {
-      console.message(error.message);
+      console.log(error.message);
     }
   };
   const handleUpdate = async (id, data) => {
