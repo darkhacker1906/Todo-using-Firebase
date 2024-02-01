@@ -4,20 +4,34 @@ import Button from "../components/Button";
 import { v4 as uuid } from "uuid";
 import TodoTable from "../components/TodoTable";
 import { db } from "../Firebase";
-import { addDoc, collection, doc, onSnapshot, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
 
 function HomeDashBoard() {
   const [todoInput, setTodoInput] = useState("");
   const [todoList, setTodoList] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [selectedTodoId, setSelectedTodoId] = useState(null);
+  const [todoFilter, setTodoFilter] = useState("all");
 
-    useEffect(()=>{
-    const unsubscribe=onSnapshot(collection(db,'todos'),(snapshot)=>{
-        setTodoList(snapshot.docs.map((doc)=>({id:doc.id,todo:doc.data().todo,checked:doc.data().checked})))
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "todos"), (snapshot) => {
+      setTodoList(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          todo: doc.data().todo,
+          checked: doc.data().checked,
+        }))
+      );
     });
-    return()=> unsubscribe();
-},[])
+    return () => unsubscribe();
+  }, []);
+  
   const handleTodoInput = (e) => {
     setTodoInput(e.target.value);
   };
@@ -25,7 +39,11 @@ function HomeDashBoard() {
   const handleSubmit = async () => {
     try {
       if (todoInput.trim() !== "") {
-        await addDoc(collection(db,'todos'),{todo:todoInput,id:uuid(),checked:false})
+        await addDoc(collection(db, "todos"), {
+          todo: todoInput,
+          id: uuid(),
+          checked: false,
+        });
         setTodoInput("");
       }
     } catch (error) {
@@ -34,17 +52,32 @@ function HomeDashBoard() {
   };
   const handleUpdate = async (id, data) => {
     try {
-    const updatedList=doc(db,'todos',todoList[selectedTodoId].id)
-    await updateDoc(updatedList,{todo:todoInput});
+      const todoToUpdate = todoList.find((todo) => todo.id === id);
+      const updatedTodoRef = doc(db, "todos", todoToUpdate.id);
+      await updateDoc(updatedTodoRef, { todo: data });
+
+      setTodoList((prevTodoList) =>
+        prevTodoList.map((todo) =>
+          todo.id === id ? { ...todo, todo: data } : todo
+        )
+      );
+      setTodoInput("");
+      setIsEdit(false);
+      setSelectedTodoId(null);
     } catch (error) {
-      console.message(error.message);
+      console.log(error.message);
     }
   };
+
   const handleCancel = () => {
     isEdit(false);
     setSelectedTodoId(null);
   };
-  console.log(selectedTodoId);
+
+  const handleFilter = (filterType) => {
+    setTodoFilter(filterType);
+  };
+
   return (
     <div className="w-[60%] m-auto">
       <form onSubmit={(e) => e.preventDefault()}>
@@ -88,6 +121,7 @@ function HomeDashBoard() {
         setIsEdit={setIsEdit}
         setSelectedTodoId={setSelectedTodoId}
         setTodoList={setTodoList}
+        todoFilter={todoFilter}
       />
     </div>
   );
