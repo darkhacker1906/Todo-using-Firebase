@@ -1,6 +1,7 @@
 import React from "react";
 
-function InputField({ inputTextType, todoInput, handleTodoInput }) {
+function InputField({ inputTextType, todoInput, handleTodoInput}) {
+  
   return (
     <div>
       <input
