@@ -39,7 +39,9 @@ function HomeDashBoard() {
 
   const handleSubmit = async () => {
     try {
-      if (todoInput.trim() !== "") {
+      if (todoInput.trim() == "") {
+        setTodoInput("");
+      } else if (todoInput.trim() !== "") {
         await addDoc(collection(db, "todos"), {
           todo: todoInput,
           id: uuid(),
@@ -52,29 +54,34 @@ function HomeDashBoard() {
     }
   };
   const handleUpdate = async (id, data) => {
-    try {
-      const todoToUpdate = todoList.find((todo) => todo.id === id);
-      const updatedTodoRef = doc(db, "todos", todoToUpdate.id);
-      await updateDoc(updatedTodoRef, { todo: data });
-
-      const updatedData = await getDocs(collection(db, "todos"));
-      const updatedTodoList = updatedData.docs.map((doc) => ({
-        id: doc.id,
-        todo: doc.data().todo,
-        checked: doc.data().checked,
-      }));
-      setTodoList(updatedTodoList);
+    if (data.trim() == "") {
       setTodoInput("");
-      setIsEdit(false);
-      setSelectedTodoId(null);
-    } catch (error) {
-      console.log(error.message);
+    } else {
+      try {
+        const todoToUpdate = todoList.find((todo) => todo.id === id);
+        const updatedTodoRef = doc(db, "todos", todoToUpdate.id);
+        await updateDoc(updatedTodoRef, { todo: data });
+
+        const updatedData = await getDocs(collection(db, "todos"));
+        const updatedTodoList = updatedData.docs.map((doc) => ({
+          id: doc.id,
+          todo: doc.data().todo,
+          checked: doc.data().checked,
+        }));
+        setTodoList(updatedTodoList);
+        setTodoInput("");
+        setIsEdit(false);
+        setSelectedTodoId(null);
+      } catch (error) {
+        console.log(error.message);
+      }
     }
   };
 
   const handleCancel = () => {
-    isEdit(false);
+    setIsEdit(false);
     setSelectedTodoId(null);
+    setTodoInput("");
   };
 
   const handleFilter = (filterType) => {

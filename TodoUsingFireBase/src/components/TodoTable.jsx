@@ -1,7 +1,7 @@
 import React from "react";
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "../Firebase";
 import Checkbox from "./Checkbox";
 
