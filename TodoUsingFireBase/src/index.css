@@ -15,6 +15,15 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+::-webkit-scrollbar{
+  width:.4rem;
+  height: 1rem;
+}
+::-webkit-scrollbar-thumb{
+  background: #efeeee;
+  border-radius: 9px;
+  background-clip: content-box;
+}
 
 a {
   font-weight: 500;
@@ -28,6 +37,7 @@ a:hover {
 body {
   min-width: 320px;
   min-height: 100vh;
+  overflow-y: hidden;
 }
 
 button {

@@ -3,7 +3,7 @@ import HomeDashBoard from './pages/HomeDashBoard'
 
 function App() {
   return (
-    <div>
+    <div className="overflow-y-hidden">
     <HomeDashBoard/>
     </div>
   )

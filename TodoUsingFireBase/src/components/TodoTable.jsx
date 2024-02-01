@@ -43,17 +43,19 @@ function TodoTable({
       const updateId = !todoToUpdate.checked;
       await updateDoc(updatedTodoRef, { checked: updateId });
 
-      setTodoList((prevTodoList) =>
-        prevTodoList.map((todo) =>
-          todo.id === id ? { ...todo, checked: updateId } : todo
-        )
-      );
+      const updatedData = await getDocs(collection(db, "todos"));
+      const updatedTodoList = updatedData.docs.map((doc) => ({
+        id: doc.id,
+        todo: doc.data().todo,
+        checked: doc.data().checked,
+      }));
+      setTodoList(updatedTodoList);
     } catch (error) {
       console.log(error);
     }
   };
   return (
-    <div>
+    <div className="overflow-y-auto  sm:h-[300px] lg:h-[330px] xl:h-[500px]">
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg ">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"></thead>

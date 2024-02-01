@@ -8,6 +8,7 @@ import {
   addDoc,
   collection,
   doc,
+  getDocs,
   onSnapshot,
   updateDoc,
 } from "firebase/firestore";
@@ -31,7 +32,7 @@ function HomeDashBoard() {
     });
     return () => unsubscribe();
   }, []);
-  
+
   const handleTodoInput = (e) => {
     setTodoInput(e.target.value);
   };
@@ -56,11 +57,13 @@ function HomeDashBoard() {
       const updatedTodoRef = doc(db, "todos", todoToUpdate.id);
       await updateDoc(updatedTodoRef, { todo: data });
 
-      setTodoList((prevTodoList) =>
-        prevTodoList.map((todo) =>
-          todo.id === id ? { ...todo, todo: data } : todo
-        )
-      );
+      const updatedData = await getDocs(collection(db, "todos"));
+      const updatedTodoList = updatedData.docs.map((doc) => ({
+        id: doc.id,
+        todo: doc.data().todo,
+        checked: doc.data().checked,
+      }));
+      setTodoList(updatedTodoList);
       setTodoInput("");
       setIsEdit(false);
       setSelectedTodoId(null);
@@ -79,7 +82,7 @@ function HomeDashBoard() {
   };
 
   return (
-    <div className="w-[60%] m-auto">
+    <div className="w-[60%] m-auto ">
       <form onSubmit={(e) => e.preventDefault()}>
         <h1 className="text-2xl text-center">Todo App</h1>
         <InputField
